@@ -1,0 +1,19 @@
+---
+
+- hosts: all
+  become: true
+  tasks:
+
+  - name: install docker container tools
+    dnf:
+      name: container-tools
+      state: latest
+
+  - name: update repository index
+    dnf:
+      update_cache: yes
+
+  - name: install httpd for apache webserver
+    dnf:
+      name: httpd
+      state: latest
