@@ -8,12 +8,15 @@
     dnf:
       name: container-tools
       state: latest
-
+    when: ansible_distribution in ["RedHat", "CentOS"] and ansible_distribution_version == "9.3"
+  
   - name: update repository index
     dnf:
       update_cache: yes
+    when: ansible_distribution in ["RedHat", "CentOS"]
 
   - name: install httpd for apache webserver
     dnf:
       name: httpd
       state: latest
+    when: ansible_distribution == "RedHat"
