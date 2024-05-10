@@ -4,19 +4,21 @@
   become: true
   tasks:
 
-  - name: install docker container tools
-    dnf:
-      name: container-tools
+  - name: install apache and php for Ubuntu servers
+    apt:
+      name: 
+        - apache2
+        - libapache2-mod-php
       state: latest
-    when: ansible_distribution in ["RedHat", "CentOS"] and ansible_distribution_version == "9.3"
-  
-  - name: update repository index
-    dnf:
       update_cache: yes
-    when: ansible_distribution in ["RedHat", "CentOS"]
+    when: ansible_distribution == "Ubuntu"
 
-  - name: install httpd for apache webserver
+
+  - name: install apache and php for RHEL servers
     dnf:
-      name: httpd
+      name:
+        - httpd
+        - php
       state: latest
+      update_cache: yes
     when: ansible_distribution == "RedHat"
