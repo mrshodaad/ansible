@@ -4,3 +4,6 @@ Father
 
 [file_servers]
 Child
+
+[workstations]
+Mother

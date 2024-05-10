@@ -18,7 +18,24 @@
       update_cache: yes
     when: ansible_distribution == "Ubuntu"
 
- 
+- hosts: workstations
+  become: true
+  tasks:
+
+    - name: install unzip
+      package:
+        name: unzip
+
+    - name: install terraform
+      unarchive:
+        src: https://releases.hashicorp.com/terraform/0.12.28/terraform_0.12.28_linux_amd64.zip
+        dest: /usr/local/bin
+        remote_src: yes
+        mode: 0755
+        owner: root
+        group: root
+
+
 - hosts: web_servers
   become: true
   tasks:
@@ -42,6 +59,14 @@
       state: latest
     when: ansible_distribution == "RedHat"
 
+  - name: start httpd (Rhel)
+    tags: apache,rhel,httpd
+    service:
+        name: httpd 
+        state: started
+        enabled: yes
+    when: ansible_distribution == "RedHat"
+
   - name: copy default html file for site
     tags: apache,httpd,rhel
     copy:
@@ -50,6 +75,24 @@
       owner: root
       group: root
       mode: 0644
+
+  - name: update server admin email in webserver config file
+    tags: apache,httpd,rhel
+    lineinfile:
+      path: /etc/httpd/conf/httpd.conf
+      regex: '^ServerAdmin'
+      line: ServerAdmin root@localhost
+    when: ansible_distribution == "RedHat"
+    register: httpd
+
+
+  - name: restart httpd service (RHEL)
+    tags: apache,httpd,rhel
+    service:
+      name: httpd
+      state: restarted
+    when: httpd.changed
+
 
 - hosts: file_servers
   become: true
