@@ -1,0 +1,44 @@
+---
+
+- hosts: all
+  become: true
+  pre_tasks:
+
+  - name: install updates (RedHat)
+    tags: always
+    dnf:
+      update_only: yes
+      update_cache: yes
+    when: ansible_distribution == "RedHat"
+
+  - name: install updates (Ubuntu)
+    tags: always
+    apt:
+      upgrade: dist
+      update_cache: yes
+    when: ansible_distribution == "Ubuntu"
+
+
+- hosts: all
+  become: true
+  tasks:
+    - name: create s1m0ne user
+      tags: always
+      user:
+        name: s1m0ne
+        groups: root
+
+    - name: add ssh key for s1m0ne
+      tags: always
+      ansible.posix.authorized_key:
+        user: s1m0ne
+        key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPs4beAxXefe+JxZeEcm3VbrZ7pcct77Z+xGa8hyEiB/ ansible"
+
+    - name: add sudoers file for s1m0ne
+      copy:
+        src: sudoer_s1m0ne
+        dest: /etc/sudoers.d/s1m0ne
+        owner: root
+        group: root
+        mode: 0440
+
