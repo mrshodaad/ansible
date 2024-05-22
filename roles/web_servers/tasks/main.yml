@@ -1,0 +1,53 @@
+- name: install apache and php for Ubuntu servers
+  tags: apache,apache2,ubuntu
+  apt:
+    name:
+      - apache2
+      - libapache2-mod-php
+    state: latest
+  when: ansible_distribution == "Ubuntu"
+
+
+- name: install apache and php for RHEL servers
+  tags: httpd,apache,rhel
+  dnf:
+    name:
+      - httpd
+      - php
+    state: latest
+  when: ansible_distribution == "RedHat"
+
+- name: start httpd (Rhel)
+  tags: apache,rhel,httpd
+  service:
+    name: httpd
+    state: started
+    enabled: yes
+  when: ansible_distribution == "RedHat"
+
+- name: copy default html file for site
+  tags: apache,httpd,rhel
+  copy:
+    src: default_site.html
+    dest: /var/www/html/index.html
+    owner: root
+    group: root
+    mode: 0644
+
+- name: update server admin email in webserver config file
+  tags: apache,httpd,rhel
+  lineinfile:
+    path: /etc/httpd/conf/httpd.conf
+    regex: '^ServerAdmin'
+    line: ServerAdmin root@localhost
+  when: ansible_distribution == "RedHat"
+  register: httpd
+
+
+- name: restart httpd service (RHEL)
+  tags: apache,httpd,rhel
+  service:
+    name: httpd
+    state: restarted
+  when: httpd.changed
+

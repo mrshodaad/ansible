@@ -1,0 +1,6 @@
+- name: add ssh key for s1m0ne
+  tags: always
+  ansible.posix.authorized_key:
+    user: s1m0ne
+    key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPs4beAxXefe+JxZeEcm3VbrZ7pcct77Z+xGa8hyEiB/ ansible"
+
